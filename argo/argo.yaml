@@ -1,0 +1,59 @@
+configs:
+  cm:
+    admin.enabled: false
+  rbac:
+    create: true
+    policy.default: ''
+    policy.csv: |
+      g, argocd-readonly, role:readonly
+      g, argocd-admin, role:admin
+  scopes: '[groups]'
+server:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 100Mi
+    repoServer:
+      resources:
+        requests:
+          cpu: 100m
+          memory: 100Mi
+    applicationSet:
+      resources:
+        requests:
+          cpu: 100m
+          memory: 100Mi
+    notifications:
+      resources:
+        requests:
+          cpu: 100m
+          memory: 100Mi
+    controller:
+      resources:
+        requests:
+          cpu: 100m
+          memory: 100Mi
+  config:
+    oidc.config: |
+      name: cognito
+      issuer: https://${cognito_endpoint} 
+      clientID: ${client_id}  
+      clientSecret: ${client_secret}
+      requestedScopes: ["openid", "phone", "email"]
+      redirectUrI: https://${domain}/api/dex/callback"
+      requestedIDTokenClaims: {"groups": {"essential": true}}
+      insecure: false
+    url: https://${domain}
+  ingress:
+    hosts:
+      - ${domain}
+    enabled: true
+    controller: aws
+    annotations:
+        kubernetes.io/ingress.class: "alb"
+        alb.ingress.kubernetes.io/scheme: internet-facing
+        alb.ingress.kubernetes.io/backend-protocol: HTTPS
+        alb.ingress.kubernetes.io/target-type: ip
+        alb.ingress.kubernetes.io/subnets: '${subnets}'
+        alb.ingress.kubernetes.io/listen-ports : '[{"HTTPS":443}]'
+        alb.ingress.kubernetes.io/certificate-arn: '${cert}'
