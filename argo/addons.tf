@@ -10,7 +10,7 @@ module "eks_blueprints_addons" {
   enable_argo_rollouts = true
   enable_argo_events   = true
   argocd = {
-    chart_version ="7.7.17"
+    chart_version    = "7.7.17"
     create_namespace = true
     values = [templatefile("${path.module}/argo.yaml",
       { domain           = var.argo_domain,

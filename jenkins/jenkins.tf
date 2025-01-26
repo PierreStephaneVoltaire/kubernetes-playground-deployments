@@ -95,7 +95,7 @@ resource "kubernetes_manifest" "jenkins_argocd_application" {
         }
       }
       destination = {
-        name    =  "in-cluster"
+        name      = "in-cluster"
         namespace = kubernetes_namespace.jenkins.metadata[0].name
       }
       syncPolicy = {
