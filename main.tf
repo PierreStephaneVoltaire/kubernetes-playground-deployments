@@ -57,6 +57,8 @@ module "argo" {
   oidc_provider_arn      = data.terraform_remote_state.eks.outputs.oidc_provider_arn
   public_subnets         = data.terraform_remote_state.network.outputs.public_subnets
   wildcard_cert          = data.terraform_remote_state.network.outputs.domain_acm_certificate_arn
+  token                  = data.aws_eks_cluster_auth.eks_auth.token
+  caData = data.terraform_remote_state.eks.outputs.cluster_certificate_authority_data
 }
 module "jenkins" {
   source             = "./jenkins"
@@ -65,4 +67,18 @@ module "jenkins" {
   cognito_uri        = data.terraform_remote_state.auth.outputs.cognito_endpoint
   jenkins_git_values = var.jenkins_git_values
   oidc_provider_arn  = data.terraform_remote_state.eks.outputs.oidc_provider_arn
+  certificate-arn    = data.terraform_remote_state.network.outputs.domain_acm_certificate_arn
+  subnets            = data.terraform_remote_state.network.outputs.public_subnets
+  cluster_endpoint       = data.terraform_remote_state.eks.outputs.cluster_endpoint
+
+}
+module "vault" {
+  source = "./vault"
+  alb_cert_arn =  data.terraform_remote_state.network.outputs.domain_acm_certificate_arn
+  app_name = var.app_name
+  domain_name = "vault.${var.domain_name}"
+  eks_issuer = data.terraform_remote_state.auth.outputs.cognito_endpoint
+  oidc_provider = data.terraform_remote_state.eks.outputs.oidc_provider_arn
+  public_subnets = data.terraform_remote_state.network.outputs.public_subnets
+  vault_version = var.vault_version
 }

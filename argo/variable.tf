@@ -34,3 +34,9 @@ variable "aws_route53_zone_arn" {
 variable "argo_domain" {
   type = string
 }
+variable "token" {
+  type = string
+}
+variable "caData" {
+  type = string
+}

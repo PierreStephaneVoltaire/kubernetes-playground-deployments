@@ -13,3 +13,12 @@ variable "oidc_provider_arn" {
 variable "jenkins_git_values" {
   type = string
 }
+variable "certificate-arn" {
+  type = string
+}
+variable "subnets" {
+  type = list(string)
+}
+variable "cluster_endpoint" {
+  type = string
+}
