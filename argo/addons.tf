@@ -10,7 +10,7 @@ module "eks_blueprints_addons" {
   enable_argo_rollouts = true
   enable_argo_events   = true
   argocd = {
-    chart_version    = "7.7.17"
+    chart_version    = "7.7.21"
     create_namespace = true
     values = [templatefile("${path.module}/argo.yaml",
       { domain           = var.argo_domain,
@@ -21,5 +21,23 @@ module "eks_blueprints_addons" {
         client_secret    = var.argo_app_client_secret
     })]
 
+  }
+}
+
+resource "kubernetes_cluster_role_binding" "argocd_admin" {
+  metadata {
+    name = "argocd-crossplane-clusterrolebinding"
+  }
+
+  role_ref {
+    kind     = "ClusterRole"
+    name     = "cluster-admin"
+    api_group = "rbac.authorization.k8s.io"
+  }
+
+  subject {
+    kind      = "ServiceAccount"
+    name      = "argocd-application-controller"
+    namespace = "argocd"
   }
 }

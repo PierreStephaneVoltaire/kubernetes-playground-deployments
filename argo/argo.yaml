@@ -23,7 +23,7 @@ configs:
     scopes: '[cognito:groups]'
   cm:
     create: true
-    admin.enabled: false
+    admin.enabled: true
     oidc.config: |
       name: cognito
       issuer: https://${cognito_endpoint}
@@ -39,8 +39,8 @@ configs:
           essential: true
       claimMappings:
         groups: "cognito:groups"
-
-
+    extraConfig:
+      accounts.admin: api
 server:
   repoServer:
     resources:
