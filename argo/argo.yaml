@@ -1,9 +1,10 @@
 global:
   domain: ${domain}
-#  logging:
-#    format: text
-#    level: info
-
+  logging:
+    format: text
+    level: info
+redis-ha:
+  enabled: false
 configs:
   url: https://${domain}
   rbac:
@@ -33,7 +34,8 @@ configs:
         - openid
         - profile
         - email
-      redirectUri: https://${domain}/api/dex/callback"
+      redirectUri: https://${domain}/api/dex/callback
+      logoutUri: https://${domain}/api/dex/logout
       requestedIDTokenClaims:
         groups:
           essential: true
