@@ -52,58 +52,60 @@ resource "kubernetes_secret" "jenkins_auth" {
 }
 
 
-
-resource "kubernetes_manifest" "jenkins_argocd_application" {
-  depends_on = [kubernetes_secret.jenkins_auth]
-  manifest = {
-    apiVersion = "argoproj.io/v1alpha1"
-    kind       = "Application"
-    metadata = {
-      name      = "jenkins"
-      namespace = "argocd"
-      labels = {
-        "argocd.argoproj.io/instance"  = "jenkins"
-        "app.kubernetes.io/name"       = "jenkins"
-        "app.kubernetes.io/part-of"    = "cicd"
-        "app.kubernetes.io/managed-by" = "argocd"
-        "app.kubernetes.io/version"    = "5.8.5"
-        "app.kubernetes.io/component"  = "ci-server"
-        "team"                         = "devops"
-        "owner"                        = "dev-team"
-    } }
-    spec = {
-      project = "jenkins"
-      source = {
-        repoURL        = "https://charts.jenkins.io"
-        targetRevision = "5.8.5"
-        chart          = "jenkins"
-        helm = {
-          valueFiles = [var.jenkins_git_values]
-          parameters = [{
-            name  = "controller.containerEnvFrom[0].secretRef.name"
-            value = kubernetes_secret.jenkins_auth.metadata[0].name
-            },
-            {
-              name  = "controller.ingress.annotations.alb\\.ingress\\.kubernetes\\.io/subnets"
-              value = join(",", var.subnets)
-            },
-            {
-              name  = "controller.ingress.annotations.alb\\.ingress\\.kubernetes\\.io/certificate-arn"
-              value = var.certificate-arn
-            }
-          ]
-        }
-      }
-      destination = {
-        name      = "in-cluster"
-        namespace = kubernetes_namespace.jenkins.metadata[0].name
-      }
-      syncPolicy = {
-        automated = {
-          prune    = true
-          selfHeal = true
-        }
-      }
-    }
-  }
-}
+#
+#
+#
+# resource "kubernetes_manifest" "jenkins_argocd_application" {
+#   depends_on = [kubernetes_secret.jenkins_auth]
+#   manifest = {
+#     apiVersion = "argoproj.io/v1alpha1"
+#     kind       = "Application"
+#     metadata = {
+#       name      = "jenkins"
+#       namespace = "argocd"
+#       labels = {
+#         "argocd.argoproj.io/instance"  = "jenkins"
+#         "app.kubernetes.io/name"       = "jenkins"
+#         "app.kubernetes.io/part-of"    = "cicd"
+#         "app.kubernetes.io/managed-by" = "argocd"
+#         "app.kubernetes.io/version"    = "5.8.5"
+#         "app.kubernetes.io/component"  = "ci-server"
+#         "team"                         = "devops"
+#         "owner"                        = "dev-team"
+#     } }
+#     spec = {
+#       project = "jenkins"
+#       source = {
+#         repoURL        = "https://charts.jenkins.io"
+#         targetRevision = "5.8.5"
+#         chart          = "jenkins"
+#         helm = {
+#           valueFiles = [var.jenkins_git_values]
+#           parameters = [{
+#             name  = "controller.containerEnvFrom[0].secretRef.name"
+#             value = kubernetes_secret.jenkins_auth.metadata[0].name
+#             },
+#             {
+#               name  = "controller.ingress.annotations.alb\\.ingress\\.kubernetes\\.io/subnets"
+#               value = join(",", var.subnets)
+#             },
+#             {
+#               name  = "controller.ingress.annotations.alb\\.ingress\\.kubernetes\\.io/certificate-arn"
+#               value = var.certificate-arn
+#             }
+#           ]
+#         }
+#       }
+#       destination = {
+#         name      = "in-cluster"
+#         namespace = kubernetes_namespace.jenkins.metadata[0].name
+#       }
+#       syncPolicy = {
+#         automated = {
+#           prune    = true
+#           selfHeal = true
+#         }
+#       }
+#     }
+#   }
+# }
