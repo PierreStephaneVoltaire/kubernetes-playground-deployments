@@ -61,6 +61,7 @@ module "argo" {
   caData                 = data.terraform_remote_state.eks.outputs.cluster_certificate_authority_data
 }
 module "jenkins" {
+  depends_on = [module.argo]
   source             = "./jenkins"
   client_id          = data.terraform_remote_state.auth.outputs.jenkins_app_client_id
   client_secret      = data.terraform_remote_state.auth.outputs.jenkins_app_client_secret
@@ -72,13 +73,8 @@ module "jenkins" {
   cluster_endpoint   = data.terraform_remote_state.eks.outputs.cluster_endpoint
 
 }
-module "vault" {
-  source         = "./vault"
-  alb_cert_arn   = data.terraform_remote_state.network.outputs.domain_acm_certificate_arn
-  app_name       = var.app_name
-  domain_name    = "vault.${var.domain_name}"
-  eks_issuer     = data.terraform_remote_state.auth.outputs.cognito_endpoint
-  oidc_provider  = data.terraform_remote_state.eks.outputs.oidc_provider_arn
-  public_subnets = data.terraform_remote_state.network.outputs.public_subnets
-  vault_version  = var.vault_version
+
+module "github" {
+  source = "./github"
+  github_username =  var.github_username
 }
