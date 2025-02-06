@@ -52,9 +52,7 @@ variable "users" {
   type = map(object({ email = string }))
 }
 
-variable "vault_version" {
-  type = string
-}
+
 variable "jenkins_git_values" {
   type = string
 }
@@ -71,3 +69,6 @@ variable "network_key" {
   type = string
 }
 
+variable "github_username" {
+  type = string
+}
