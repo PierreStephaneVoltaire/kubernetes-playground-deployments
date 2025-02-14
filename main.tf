@@ -4,6 +4,10 @@ terraform {
       source  = "hashicorp/aws"
       version = ">= 5.8"
     }
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "4.18.0"
+    }
     kubectl = {
       source  = "gavinbunney/kubectl"
       version = "> 1.16.0"
@@ -60,18 +64,9 @@ module "argo" {
   token                  = data.aws_eks_cluster_auth.eks_auth.token
   caData                 = data.terraform_remote_state.eks.outputs.cluster_certificate_authority_data
 }
-module "jenkins" {
-  depends_on = [module.argo]
-  source             = "./jenkins"
-  client_id          = data.terraform_remote_state.auth.outputs.jenkins_app_client_id
-  client_secret      = data.terraform_remote_state.auth.outputs.jenkins_app_client_secret
-  cognito_uri        = data.terraform_remote_state.auth.outputs.cognito_endpoint
-  jenkins_git_values = var.jenkins_git_values
-  oidc_provider_arn  = data.terraform_remote_state.eks.outputs.oidc_provider_arn
-  certificate-arn    = data.terraform_remote_state.network.outputs.domain_acm_certificate_arn
-  subnets            = data.terraform_remote_state.network.outputs.public_subnets
-  cluster_endpoint   = data.terraform_remote_state.eks.outputs.cluster_endpoint
 
+module "azure" {
+  source = "./azure"
 }
 
 module "github" {

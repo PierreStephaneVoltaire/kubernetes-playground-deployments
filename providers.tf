@@ -34,3 +34,10 @@ provider "kubectl" {
   load_config_file       = false
   cluster_ca_certificate = base64decode(data.terraform_remote_state.eks.outputs.cluster_certificate_authority_data)
 }
+
+provider "azurerm" {
+  features {}
+  subscription_id = var.subscription_id
+}
+
+

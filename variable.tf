@@ -72,3 +72,20 @@ variable "network_key" {
 variable "github_username" {
   type = string
 }
+
+variable "subscription_id" {
+  type      = string
+  sensitive = true
+}
+variable "htpasswd" {
+type = string
+  sensitive = true
+}
+variable "loki_username" {
+  type = string
+  sensitive = true
+}
+variable "loki_password" {
+  type = string
+  sensitive = true
+}
