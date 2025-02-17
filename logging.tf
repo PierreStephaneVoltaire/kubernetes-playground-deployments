@@ -120,3 +120,61 @@ resource "kubernetes_service_account" "sa" {
   }
 }
 
+
+resource "kubernetes_manifest" "external_secret_cert" {
+  count = 1
+  depends_on = [kubernetes_manifest.cluster_secret_store]
+  manifest = {
+    apiVersion = "external-secrets.io/v1beta1"
+    kind       = "ExternalSecret"
+    metadata = {
+      name      = "alb-certificate-secret"
+      namespace = "monitoring"
+    }
+    spec = {
+      secretStoreRef = {
+        name = "aws-secret-store"
+        kind = "ClusterSecretStore"
+      }
+      target = {
+        name            = "alb-certificate"
+        creationPolicy  = "Owner"
+      }
+      data = [{
+        secretKey = "certificate-arn"
+        remoteRef = {
+          key = aws_ssm_parameter.alb_certificate_arn.name
+        }
+      }]
+    }
+  }
+}
+
+resource "kubernetes_manifest" "external_secret_subnets" {
+  count = 1
+  depends_on = [kubernetes_manifest.cluster_secret_store]
+  manifest = {
+    apiVersion = "external-secrets.io/v1beta1"
+    kind       = "ExternalSecret"
+    metadata = {
+      name      = "subnets-secret"
+      namespace = "monitoring"
+    }
+    spec = {
+      secretStoreRef = {
+        name = "aws-secret-store"
+        kind = "ClusterSecretStore"
+      }
+      target = {
+        name            = "subnets"
+        creationPolicy  = "Owner"
+      }
+      data = [{
+        secretKey = "subnets"
+        remoteRef = {
+          key = aws_ssm_parameter.subnets.name
+        }
+      }]
+    }
+  }
+}
