@@ -16,13 +16,17 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "loki_encryption" 
   }
 }
 
-
+resource "kubernetes_namespace" "monitoring" {
+  metadata {
+    name = "monitoring"
+  }
+}
 
 resource "kubernetes_secret" "loki_creds" {
   count = length(var.htpasswd)>0?1:0
   metadata {
     name      = "loki-basic-auth"
-    namespace = "monitoring"
+    namespace = kubernetes_namespace.monitoring.metadata[0].name
   }
   data = {
     ".htpasswd" = base64encode(var.htpasswd)
@@ -34,7 +38,7 @@ resource "kubernetes_secret" "canary_creds" {
   count = length(var.loki_username)>0 &&  length(var.loki_password)>0 ?1:0
   metadata {
     name      = "canary-basic-auth"
-    namespace = "monitoring"
+    namespace =  kubernetes_namespace.monitoring.metadata[0].name
   }
   data = {
     "username" = base64encode(var.loki_username)
@@ -112,10 +116,10 @@ resource "kubernetes_service_account" "sa" {
   count = length(var.htpasswd)>0?1:0
   metadata {
     name      = "loki-service-account"
-    namespace = "monitoring"
+    namespace =  kubernetes_namespace.monitoring.metadata[0].name
     annotations = {
       "eks.amazonaws.com/role-arn"     = aws_iam_role.sa[0].arn
-      "meta.helm.sh/release-namespace" = "monitoring"
+      "meta.helm.sh/release-namespace" =  kubernetes_namespace.monitoring.metadata[0].name
     }
   }
 }
@@ -129,7 +133,7 @@ resource "kubernetes_manifest" "external_secret_cert" {
     kind       = "ExternalSecret"
     metadata = {
       name      = "alb-certificate-secret"
-      namespace = "monitoring"
+      namespace =  kubernetes_namespace.monitoring.metadata[0].name
     }
     spec = {
       secretStoreRef = {
@@ -158,7 +162,7 @@ resource "kubernetes_manifest" "external_secret_subnets" {
     kind       = "ExternalSecret"
     metadata = {
       name      = "subnets-secret"
-      namespace = "monitoring"
+      namespace =  kubernetes_namespace.monitoring.metadata[0].name
     }
     spec = {
       secretStoreRef = {
@@ -178,3 +182,4 @@ resource "kubernetes_manifest" "external_secret_subnets" {
     }
   }
 }
+

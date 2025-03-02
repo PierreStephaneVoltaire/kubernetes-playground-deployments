@@ -1,0 +1,61 @@
+workflow:
+  namespace:
+  serviceAccount:
+    create: true
+controller:
+  rbac:
+    create: true
+    secretWhitelist: []
+    accessAllSecrets: true
+    writeConfigMaps: true
+  metricsConfig:
+    enabled: true
+  persistence: {}
+  telemetryConfig:
+    enabled: true
+  serviceMonitor:
+    enabled: true
+    additionalLabels: {}
+    namespace: "argocd"
+
+  workflowNamespaces:
+    - argocd
+    - default
+  logging:
+    # -- Set the logging level (one of: `debug`, `info`, `warn`, `error`)
+    level: info
+    # -- Set the glog logging level
+    globallevel: "0"
+    # -- Set the logging format (one of: `text`, `json`)
+    format: "text"
+
+
+
+server:
+  enabled: true
+  autoscaling:
+    enabled: true
+  logging:
+    # -- Set the logging level (one of: `debug`, `info`, `warn`, `error`)
+    level: info
+    # -- Set the glog logging level
+    globallevel: "0"
+    # -- Set the logging format (one of: `text`, `json`)
+    format: "text"
+
+  ## Ingress configuration.
+  # ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
+  ingress:
+    hosts:
+      - ${domain}
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: "alb"
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/backend-protocol: HTTPS
+      alb.ingress.kubernetes.io/target-type: ip
+      alb.ingress.kubernetes.io/subnets: '${subnets}'
+      alb.ingress.kubernetes.io/listen-ports : '[{"HTTP": 80}, {"HTTPS":443}]'
+      alb.ingress.kubernetes.io/certificate-arn: '${cert}'
+      alb.ingress.kubernetes.io/ssl-redirect: '443'
+

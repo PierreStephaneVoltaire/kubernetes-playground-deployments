@@ -8,6 +8,20 @@ module "eks_blueprints_addons" {
   enable_argocd        = true
   enable_argo_rollouts = true
   enable_argo_events   = true
+  enable_argo_workflows = true
+  argo_workflows = {
+    namespace     = "argocd"
+    create_namespace = false
+    values = [templatefile("${path.module}/workflow.yaml",
+      { domain           = var.argo_domain,
+        cert             = var.wildcard_cert,
+        subnets          = join(",", var.public_subnets),
+        cognito_endpoint = var.cognito_endpoint
+        client_id        = var.argo_app_client_id
+        client_secret    = var.argo_app_client_secret
+      })]
+
+  }
   argocd = {
     chart_version    = "7.7.23"
     create_namespace = true

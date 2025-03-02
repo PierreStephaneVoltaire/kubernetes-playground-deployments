@@ -70,26 +70,17 @@ server:
   config:
     url: https://${domain}
 
-
-
   resources:
     requests:
       cpu: 100m
       memory: 100Mi
-  ingress:
-    hosts:
-      - ${domain}
-    enabled: true
-    annotations:
-        kubernetes.io/ingress.class: "alb"
-        alb.ingress.kubernetes.io/scheme: internet-facing
-        alb.ingress.kubernetes.io/backend-protocol: HTTPS
-        alb.ingress.kubernetes.io/target-type: ip
-        alb.ingress.kubernetes.io/subnets: '${subnets}'
-        alb.ingress.kubernetes.io/listen-ports : '[{"HTTP": 80}, {"HTTPS":443}]'
-        alb.ingress.kubernetes.io/certificate-arn: '${cert}'
-        alb.ingress.kubernetes.io/ssl-redirect: '443'
 
+  service:
+    type: LoadBalancer
+    annotations:
+        service.beta.kubernetes.io/aws-load-balancer-ssl-cert: '${cert}'
+        service.beta.kubernetes.io/aws-load-balancer-tls-ports: "443"
+        service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "https"
 
 
 
